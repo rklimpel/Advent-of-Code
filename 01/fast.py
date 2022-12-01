@@ -2,12 +2,15 @@ import sys
 
 calorieList = []
 currentElfCalories = 0
-for line in open('input1.txt','r').readlines():
+for line in open('input.txt','r').readlines():
     if line == '\n':
         calorieList.append(currentElfCalories)
         currentElfCalories = 0
     else:
         currentElfCalories += int(line)
+
+print("Most Calories: " + str(max(calorieList)))
+print("That guy with a lot of calories is elf number " + str(calorieList.index(max(calorieList)) +1 ))
 
 topThreeCalories = 0
 for i in range(3):
