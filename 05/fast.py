@@ -20,7 +20,7 @@ for moveLine in moveLines:
     count, start, end = moveNumbers
     movingItems = stacks[start-1][-count:]
     stacks[start-1] = stacks[start-1][:len(stacks[start-1])-count]
-    if solve == 1:
+    if SOLVE == 1:
         movingItems.reverse()
     stacks[end-1] += movingItems
 
