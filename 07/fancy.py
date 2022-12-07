@@ -1,9 +1,5 @@
-TOTAL_FILESYSTEM = 70000000
-UPDATE_SIZE = 30000000
-
-filesystem = {}
-allPaths = []
-currentPath = []
+TOTAL_FILESYSTEM = 70000000; UPDATE_SIZE = 30000000
+filesystem = {}; allPaths = []; currentPath = []
 
 def nested_set(dic, keys, value):
     for key in keys[:-1]: dic = dic.setdefault(key, {})
@@ -14,13 +10,7 @@ def getFromDict(dataDict, mapList):
     return dataDict
 
 def recursiveSize(d):
-    size = 0
-    for k in d.keys():
-        if isinstance(d[k], dict):
-            size += recursiveSize(d[k])
-        else:            
-            size += d[k]
-    return size
+    return sum([recursiveSize(d[k]) if isinstance(d[k], dict) else d[k] for k in d.keys()])
 
 for line in open("input.txt", "r").read().split('\n'):
     if "$ cd" in line:
@@ -28,14 +18,12 @@ for line in open("input.txt", "r").read().split('\n'):
         if path == "..": currentPath = currentPath[:-1]
         else: 
             currentPath.append(path)
-            if not currentPath in allPaths:   
-                allPaths.append(currentPath[:])
+            if not currentPath in allPaths: allPaths.append(currentPath[:])
     elif line[0].isnumeric():
         size, file = line[:line.index(" ")], line[line.index(" ")+1:]
         nested_set(filesystem, currentPath + [file], int(size))
 
-dirSizes = {}
-for path in allPaths: dirSizes['/'.join(path)] = recursiveSize(getFromDict(filesystem, path))
+dirSizes = {'/'.join(path):recursiveSize(getFromDict(filesystem, path)) for path in allPaths}
 neededSpace = UPDATE_SIZE - (TOTAL_FILESYSTEM - recursiveSize(filesystem['/']))
 
 print('Task 1: ' + str(sum([dirSizes[k] if dirSizes[k] <= 100000 else 0 for k in dirSizes.keys()])))
