@@ -1,66 +1,56 @@
-X = 0
-Y = 1
-
-def printGrid(rope, includePositions = False):
-    for y in range(0,GRID+1):
-        for x in range(0,GRID+1):
-            if y == GRID and x == GRID: None
-            elif y == GRID: print(str(x) + ' ', end='')
-            elif x == GRID: print(str(y), end="")
-            elif rope.h == [x,y]: print('H ', end = '')
-            elif rope.t == [x,y]: print('T ', end = '')
-            elif rope.s == [x,y]: print('S ', end = '')
-            else: print('. ', end='')
-        print()
-    if includePositions:
-        print("Head: " + str(rope.h))
-        print("Tail: " + str(rope.t))
-
-class Rope():
-
-    def __init__(self,startPosition):
-        self.t = startPosition[:]
-        self.h = startPosition[:]
-        self.s = startPosition[:]
-
-    def moveHead(self, d):
-        if d == "U": self.h[Y] -= 1
-        elif d == "D": self.h[Y] += 1
-        elif d == "L": self.h[X] -= 1
-        elif d == "R": self.h[X] += 1
-        self.moveTail()
-
-    def knotsTouching(self):
-        for x in range(-1, 2):
-            for y in range(-1, 2):
-                if self.h[X] + x == self.t[X] and self.h[Y] + y == self.t[Y]: return True
-        return False
-
-    def moveTail(self):
-        if not self.knotsTouching(): 
-            if self.h[X] > self.t[X]: self.t[X] += 1
-            elif self.h[X] < self.t[X]: self.t[X] -= 1
-            if self.h[Y] > self.t[Y]: self.t[Y] += 1
-            elif self.h[Y] < self.t[Y]: self.t[Y] -= 1
-
-
-
-START = [5,5]; GRID = START[X]*2
-tailPositions = []
-rope = Rope(START)
-
-printGrid(rope, includePositions=True)
-
 lines = open("input.txt", "r").read().split('\n')
-for line in lines:
-    direction, steps = line.split(' ')
-    for _ in range(0, int(steps)):
-        rope.moveHead(direction)
-        tailPositions.append(str(rope.t))
-        # print("-----")
-        # printGrid(rope, includePositions=True)
 
-print(len(list(set(tailPositions))))
+treeMap = [list(line) for line in lines]
+visibleTrees = 0
+for y in range(len(treeMap)):
+    for x in range(len(treeMap[0])):
+        size = treeMap[y][x]
+        visible = False
+        if y == 0 or y == len(treeMap) or x == 0 or x == len(treeMap[0]):
+            visible = True
+        else:
+            visibleTop, visibleBottom, visibleLeft, visibleRight = True, True, True, True
+            for y2 in range(0, y): visibleTop = False if treeMap[y2][x] >= size else visibleTop
+            for y2 in range(y+1,len(treeMap)): visibleBottom = False if treeMap[y2][x] >= size else visibleBottom
+            for x2 in range(0, x): visibleLeft = False if treeMap[y][x2] >= size else visibleLeft
+            for x2 in range(x+1, len(treeMap[0])): visibleRight = False if treeMap[y][x2] >= size else visibleRight
+            visible = True if visibleTop or visibleBottom or visibleLeft or visibleRight else visible
+        visibleTrees += 1 if visible else 0
 
-# 5739 too low
-# 5740 too low
+print('Task 1: ' + str(visibleTrees))
+
+scenicScores = [[0 for i in range(len(treeMap[k]))] for k in range(len(treeMap))]
+for y in range(len(treeMap)):
+    for x in range(len(treeMap[0])):
+        size = treeMap[y][x]
+        scoreLeft, scoreRight, scoreUp, scoreDown = 0, 0, 0, 0
+        for y2 in reversed(range(0, y)): 
+            if treeMap[y2][x] < size: 
+                scoreUp += 1
+            elif treeMap[y2][x] >= size: 
+                scoreUp += 1
+                break
+        if y != len(treeMap):
+            for y2 in range(y+1,len(treeMap)): 
+                if treeMap[y2][x] < size:
+                    scoreDown += 1
+                elif treeMap[y2][x] >= size:
+                    scoreDown += 1
+                    break
+        for x2 in reversed(range(0, x)): 
+            if treeMap[y][x2] < size:
+                scoreRight += 1
+            else:
+                scoreRight += 1
+                break
+        if x != len(treeMap[0]):
+            for x2 in range(x+1, len(treeMap[0])): 
+                if treeMap[y][x2] < size:
+                    scoreLeft += 1
+                else:
+                    scoreLeft += 1
+                    break
+        scenicScores[y][x] = scoreUp * scoreDown * scoreLeft * scoreRight
+
+print('Task 2: ' + str(max(map(max, scenicScores))))
+
