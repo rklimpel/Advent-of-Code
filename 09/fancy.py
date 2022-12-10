@@ -29,7 +29,7 @@ for line in open("input.txt", "r").read().split('\n'):
     direction, steps = line.split(' ')
     for _ in range(0, int(steps)):
         rope1.moveHead(direction); rope2.moveHead(direction)
-        tailPositions1.add((rope1.k[-1][X], rope1.k[-1][Y])); tailPositions2.add((rope2.k[-1][X], rope2.k[-1][Y]))
+        tailPositions1.add(tuple(rope1.k[-1])); tailPositions2.add(tuple(rope2.k[-1]))
 
 print('Task 1: ' + str(len(list(tailPositions1))))
 print('Task 2: ' + str(len(list(tailPositions2))))
