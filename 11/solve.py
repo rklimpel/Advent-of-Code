@@ -1,6 +1,3 @@
-import math
-import sys
-sys.set_int_max_str_digits(9999999)
 
 def fixNumber(i):
     return int(i.replace(' ',''))
@@ -25,7 +22,7 @@ class Monkey():
             + 'ifTrue: ' + str(self.ifTrue) + '\n' \
             + 'ifFalse: ' + str(self.ifFalse)
 
-
+MOD = 2 * 3 * 5 * 7 * 11 * 13 * 17 * 19 * 23
 lines = open("input.txt", "r").read().split('\n')
 monkeyCount = int(lines[0::7][-1].split(' ')[1].replace(':',''))
 inspectionCount = [0 for _ in range(0,monkeyCount+1)]
@@ -37,7 +34,7 @@ for i in range(0, monkeyCount +1):
     # print(m)
     monkeys.append(m)
 
-for r in range(0,10000):
+for r in range(1,10001):
     for m in monkeys:
         #print(m)
         for i in m.items:
@@ -48,7 +45,8 @@ for r in range(0,10000):
             else: 
                 w = i * int(m.operationNumber) if m.operation == '*' else i + int(m.operationNumber)
 
-            # w = math.floor(w/3)
+            w = w % MOD # TASK 2
+            # w = math.floor(w/3) # TASK 1
 
             if w % m.testNumber == 0: 
                 monkeys[m.ifTrue].items.append(w)
@@ -61,7 +59,7 @@ for r in range(0,10000):
     # for m in monkeys:
         #print("Monkey " + str(m.id) + ": " + str(m.items))
 
-    if r % 1 == 0:
+    if r % 1000 == 0:
         print(" === ROUND " + str(r) + " === ")
         for m in monkeys:
             print("Monkey " + str(m.id) + " inspected items " + str(inspectionCount[m.id]) + " times.")
@@ -71,9 +69,4 @@ def mult(l):
     for x in l: result = result * x
     return result
 
-print((sorted(inspectionCount)[-2:]))
 print(mult((sorted(inspectionCount)[-2:])))
-
-
-
-# 485 too low
