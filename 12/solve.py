@@ -85,9 +85,11 @@ lines = open("input.txt", "r").read().split('\n')
 mapMatrix = []
 start = (0,0)
 end = (0,0)
+all_a_starts = []
 
 for i in range(len(lines)):
-    if 'S' in lines[i]: start = (lines[i].index('S'), i)
+    if 'S' in lines[i]: 
+        start = (lines[i].index('S'), i)
     if 'E' in lines[i]: end = (lines[i].index('E'), i)
     mapMatrix.append(list(lines[i]))
 
@@ -98,4 +100,21 @@ print_map(mapMatrix)
 print(start)
 print(end)
 print(path)
-print(len(path)-1)
+print('Task 1: ' + str(len(path)-1))
+
+for y in range(len(mapMatrix)):
+    for x in range(len(mapMatrix[0])):
+        if mapMatrix[y][x] == 'a' or mapMatrix[y][x] == 'S':
+            all_a_starts.append((x, y))
+
+print("Found possible starting points: " + str(len(all_a_starts)))
+
+all_path_lengths = []
+
+for start_point in all_a_starts:
+    came_from, cost = a_star(Map(mapMatrix), start_point, end)
+    path = reconstruct_path(came_from, start_point, end)
+    if len(path) != 0:
+        all_path_lengths.append(len(path)-1)
+
+print("Task 2: " + str(min(all_path_lengths)))
