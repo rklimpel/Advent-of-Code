@@ -38,8 +38,8 @@ def find_outside_cubes(start, cubes):
         for neighbor in cube.get_neighbors_list():
             if neighbor not in visited:
                 visited.append(neighbor)
-                if neighbor.x >= 0 and neighbor.x <= max_x + 1 and neighbor.y >= 0 and neighbor.y <= max_y and \
-                    neighbor.z >= 0 and neighbor.z <= max_z and neighbor not in cubes and neighbor not in outside:
+                if neighbor.x >= -1 and neighbor.x <= max_x + 1 and neighbor.y >= -1 and neighbor.y <= max_y + 1 and \
+                    neighbor.z >= -1 and neighbor.z <= max_z + 1 and neighbor not in cubes and neighbor not in outside:
                         queue.append(neighbor)
     return outside
 
@@ -55,7 +55,7 @@ max_z = max(map(lambda cube: cube.z, cubes))
 
 
 print("Find Outside Cubes...")
-outside_cubes = find_outside_cubes(Cube((max_x, max_y, max_z)), cubes)
+outside_cubes = find_outside_cubes(Cube((0, 0, 0)), cubes)
 
 print("Done.")
 fill_cubes = []
@@ -82,7 +82,3 @@ print("Done.")
 
 print(sum)
 
-
-# 2546 too low
-# 2692 is wrong
-# 4348 too high
