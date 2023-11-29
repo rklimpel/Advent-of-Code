@@ -1,3 +1,3 @@
-# Advent-of-Code-2022
+# Advent-of-Code
 
-Some quick solutions for https://adventofcode.com/ in year 2022.
+Solutions for https://adventofcode.com/.
