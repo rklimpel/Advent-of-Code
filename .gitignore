@@ -344,3 +344,5 @@ ASALocalRun/
 **/AdventOfCode/Solutions/Year*/Inputs/*input*
 **/AdventOfCode/Solutions/Year*/Inputs/*Input*
 **/.editorconfig
+
+**/.idea
