@@ -31,7 +31,6 @@ class Solution : SolutionBase
   protected override string SolvePartTwo()
   {
     string[] numberStrings = { "one", "two", "three", "four", "five", "six", "seven", "eight", "nine" };
-    string[] digitStrings = { "1", "2", "3", "4", "5", "6", "7", "8", "9" };
     
     string[] lines = Input.Split(
       new [] { Environment.NewLine },
@@ -43,8 +42,7 @@ class Solution : SolutionBase
     foreach (var line in lines)
     {
       List<int> numberList = new List<int>();
-
-      for (int i = 0; i < line.Length + 1; i++)
+      for (int i = 0; i < line.Length; i++)
       {
         string substring = line.Substring(i, line.Length - i);
         string matchedNumber = numberStrings.FirstOrDefault(s => substring.StartsWith(s));
@@ -55,11 +53,9 @@ class Solution : SolutionBase
         }
         else
         {
-          string matchedDigit = digitStrings.FirstOrDefault(s => substring.StartsWith(s));
-
-          if (matchedDigit != null)
+          if (int.TryParse(substring[0].ToString(), out _))
           {
-            numberList.Add(Int32.Parse(matchedDigit));
+            numberList.Add(Int32.Parse(substring[0].ToString()));
           }
         }
       }
@@ -69,8 +65,6 @@ class Solution : SolutionBase
         int result = Int32.Parse(numberList.First().ToString() + numberList.Last().ToString());
         total += result;
       }
-      
-      
     }
     return total.ToString();
   }
