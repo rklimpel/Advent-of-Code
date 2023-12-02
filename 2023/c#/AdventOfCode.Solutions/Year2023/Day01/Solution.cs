@@ -45,7 +45,7 @@ class Solution : SolutionBase
       for (int i = 0; i < line.Length; i++)
       {
         string substring = line.Substring(i, line.Length - i);
-        string matchedNumber = numberStrings.FirstOrDefault(s => substring.StartsWith(s));
+        string? matchedNumber = numberStrings.FirstOrDefault(s => substring.StartsWith(s));
 
         if (matchedNumber != null)
         {
