@@ -17,11 +17,11 @@ class Solution : SolutionBase
     {
       if (!lines[i].Contains(':')) return;
 
-      string[]? split = lines[i]
+      string[] split = lines[i]
           .Split(':')
           .Skip(1)
           .Select(s => s.Split('|'))
-          .FirstOrDefault();
+          .First();
 
       var winningNumbers = split[0].Split(" ")
           .Where(i => i != string.Empty)
