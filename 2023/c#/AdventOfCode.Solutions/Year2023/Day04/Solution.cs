@@ -1,5 +1,3 @@
-using System.Text.RegularExpressions;
-
 namespace AdventOfCode.Solutions.Year2023.Day04;
 
 class Solution : SolutionBase
