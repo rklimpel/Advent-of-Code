@@ -5,6 +5,7 @@ namespace AdventOfCode.Solutions.Year2023.Day04;
 class Solution : SolutionBase
 {
     private int score = 0;
+    private int[] cardCopies;
     public Solution() : base(04, 2023, "")
     {
         string[] lines = Input.Split(
@@ -12,11 +13,15 @@ class Solution : SolutionBase
             StringSplitOptions.None
         );
         
+        cardCopies = Enumerable.Repeat(1, lines.Length - 1).ToArray();
 
-        foreach (var line in lines)
+        for (int i = 0; i < lines.Length; i++)
         {
-            if (!line.Contains(':')) return;
-            string numberString = line.Split(':')[1];
+            if (!lines[i].Contains(':')) return;
+            string card = lines[i].Split(':')[0];
+            Console.WriteLine($"process {card}");
+            Console.WriteLine($"Card copies {cardCopies[i]}");
+            string numberString = lines[i].Split(':')[1];
             string[] split = numberString.Split('|');
             
             var winningNumbers = split[0].Split(" ")
@@ -38,6 +43,13 @@ class Solution : SolutionBase
             Console.WriteLine("matches: " + matches);
             Console.WriteLine("add: " + Math.Pow(2, matches - 1));
             score += (int)Math.Pow(2, matches - 1);
+
+            int max = i + matches > lines.Length ? lines.Length : i + matches;
+            for (int j = i + 1; j <= max; j++)
+            {
+                cardCopies[j] += cardCopies[i];
+                Console.WriteLine($"Increase CardCopies of Card {j+1} to {cardCopies[j]}");
+            }
             
             Console.WriteLine(score);
         }
@@ -50,6 +62,6 @@ class Solution : SolutionBase
 
     protected override string SolvePartTwo()
     {
-        return "";
+        return cardCopies.Sum().ToString();
     }
 }
