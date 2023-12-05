@@ -34,8 +34,10 @@ class Solution : SolutionBase
 
         for (int i = 0; i < tmp.Count; i += 2)
         {
-            itemsTask2.Add((tmp[i], tmp[i] + tmp[i + 1]));
+            itemsTask2.Add((tmp[i], tmp[i] + tmp[i + 1] - 1));
         }
+
+        itemsTask2 = itemsTask2.OrderBy(i => i.Item1).ToList();
 
 
         TransformationInfo? transformationInfo = null;
@@ -103,23 +105,43 @@ class Solution : SolutionBase
 
     protected override string SolvePartTwo()
     {
-        return "x";
-        Item item = new Item("location", 0);
-        while (item.Type != "seed")
+        long min = itemsTask2.Min(range => range.Item1);
+        long max = itemsTask2.Max(range => range.Item2);
+        Console.WriteLine($"Min Seed = {min}");
+        Console.WriteLine($"Min Seed = {max}");
+
+        long location = -1;
+        Item item;
+
+        do
         {
+            location += 1;
+            //Console.WriteLine($"Check Seed for Location {location}");
+            item = new Item("location", location);
+            while (item.Type != "seed")
+            {
+                //Console.WriteLine($"Search for transformation Infos for type {item.Type}");
+                var transformationInfo = transformationInfos
+                    .Where(t => t.to == item.Type)
+                    .ToList().First();
 
-            //Console.WriteLine($"Search for transformation Infos for type {item.Type}");
-            var transformationInfo = transformationInfos
-                .Where(t => t.to == item.Type)
-                .ToList().First();
+                item.Id = transformationInfo.Apply(item.Id, reverse: true);
+                //Console.WriteLine($"Transformed {item.Type} to {transformationInfo.from} with new Id {item.Id}");
+                item.Type = transformationInfo.from;
+            }
+        } while (!CheckSeedExists(itemsTask2, item.Id));
 
-            item.Id = transformationInfo.Apply(item.Id);
-            //Console.WriteLine($"Transformed {item.Type} to {transformationInfo.to}");
-            item.Type = transformationInfo.to;
+        Console.WriteLine($"Successfull Seed is {item.Id}");
+        return location.ToString();
+    }
+
+    private bool CheckSeedExists(List<(long, long)> seedList, long seed)
+    {
+        foreach (var item in seedList)
+        {
+            if (seed >= item.Item1 && seed <= item.Item2) return true;
         }
-
-        return itemsTask1.Select(i => i.Id).ToList().Min().ToString();
-
+        return false;
     }
 }
 
@@ -130,6 +152,9 @@ class TransformationInfo(string from, string to)
 
     public List<(long, long, long)> map = [];
 
+ 
+    public List<(long, long, long)> mapReverse = [];
+
     public void AddMapEntries(long destinationRangeStart, long sourceRangeStart, long rangeLength)
     {
         map.Add((
@@ -137,25 +162,25 @@ class TransformationInfo(string from, string to)
             sourceRangeStart + rangeLength,
             destinationRangeStart - sourceRangeStart
         ));
+
+        mapReverse.Add((
+            destinationRangeStart,
+            destinationRangeStart + rangeLength,
+            sourceRangeStart -destinationRangeStart
+        ));
     }
 
-    public long Apply(long number, bool reverse = false)
+    public long Apply(long number, bool reverse=false)
     {
-        var info = map.Find(x => x.Item1 <= number && x.Item2 >= number);
+        var activeMap = reverse ? mapReverse : map;
+        var info = activeMap.Find(x => x.Item1 <= number && x.Item2 >= number);
         if (info == (0, 0, 0))
         {
             return number;
         }
         else
         {
-            if (reverse)
-            {
-                return number - info.Item3;
-            }
-            else
-            {
-                return number + info.Item3;
-            }
+            return number + info.Item3;
         }
     }
 
