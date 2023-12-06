@@ -37,14 +37,15 @@ class Solution : SolutionBase
             itemsTask2.Add((tmp[i], tmp[i] + tmp[i + 1] - 1));
         }
 
-        itemsTask2 = itemsTask2.OrderBy(i => i.Item1).ToList();
-
+        itemsTask2 = itemsTask2
+            .OrderBy(i => i.Item1)
+            .ToList();
 
         TransformationInfo? transformationInfo = null;
         for (int i = 1; i < lines.Length; i++)
         {
             var currentLine = lines[i];
-            Console.WriteLine($"process line: {currentLine}");
+            //Console.WriteLine($"process line: {currentLine}");
 
             if (currentLine == "\n" || currentLine == "")
             {
@@ -108,7 +109,7 @@ class Solution : SolutionBase
         long min = itemsTask2.Min(range => range.Item1);
         long max = itemsTask2.Max(range => range.Item2);
         Console.WriteLine($"Min Seed = {min}");
-        Console.WriteLine($"Min Seed = {max}");
+        Console.WriteLine($"Max Seed = {max}");
 
         long location = -1;
         Item item;
@@ -116,7 +117,11 @@ class Solution : SolutionBase
         do
         {
             location += 1;
-            //Console.WriteLine($"Check Seed for Location {location}");
+            if (location % 5000000 == 0)
+            {
+                Console.WriteLine($"Check locations > {location}");
+            }
+
             item = new Item("location", location);
             while (item.Type != "seed")
             {
@@ -129,7 +134,7 @@ class Solution : SolutionBase
                 //Console.WriteLine($"Transformed {item.Type} to {transformationInfo.from} with new Id {item.Id}");
                 item.Type = transformationInfo.from;
             }
-        } while (!CheckSeedExists(itemsTask2, item.Id));
+        } while (item.Id < min || item.Id > max || !CheckSeedExists(itemsTask2, item.Id));
 
         Console.WriteLine($"Successfull Seed is {item.Id}");
         return location.ToString();
@@ -152,7 +157,7 @@ class TransformationInfo(string from, string to)
 
     public List<(long, long, long)> map = [];
 
- 
+
     public List<(long, long, long)> mapReverse = [];
 
     public void AddMapEntries(long destinationRangeStart, long sourceRangeStart, long rangeLength)
@@ -166,11 +171,11 @@ class TransformationInfo(string from, string to)
         mapReverse.Add((
             destinationRangeStart,
             destinationRangeStart + rangeLength,
-            sourceRangeStart -destinationRangeStart
+            sourceRangeStart - destinationRangeStart
         ));
     }
 
-    public long Apply(long number, bool reverse=false)
+    public long Apply(long number, bool reverse = false)
     {
         var activeMap = reverse ? mapReverse : map;
         var info = activeMap.Find(x => x.Item1 <= number && x.Item2 >= number);
