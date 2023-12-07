@@ -72,10 +72,7 @@ class Solution : SolutionBase
             .OrderByDescending(x => x)
             .ToList();
         double maxCount = groupCounts[0];
-        if ((maxCount == 3 || maxCount == 2) && groupCounts[1] == 2)
-        {
-            maxCount += 0.5;
-        }
+        if ((maxCount == 3 || maxCount == 2) && groupCounts[1] == 2) maxCount += 0.5;
         return maxCount;
     }
 
@@ -90,10 +87,7 @@ class Solution : SolutionBase
             .ToList();
         if (groupCounts.Count == 0) return jokerCount;
         double maxCount = groupCounts[0] + jokerCount;
-        if ((maxCount == 3 || maxCount == 2) && groupCounts[1] == 2)
-        {
-            maxCount += 0.5;
-        }
+        if ((maxCount == 3 || maxCount == 2) && groupCounts[1] == 2) maxCount += 0.5;
         return maxCount;
     }
 
