@@ -1,3 +1,5 @@
+using System.Numerics;
+
 namespace AdventOfCode.Solutions.Year2023.Day08;
 
 class Solution : SolutionBase
@@ -57,22 +59,35 @@ class Solution : SolutionBase
             .ToArray();
 
         Console.WriteLine("Start with nodes: " + string.Join(", ", currentNodes));
+        long[] minimumSteps = Enumerable.Repeat(long.MaxValue, currentNodes.Length).ToArray();
 
-        int directionPosition = 0;
-        long steps = 0;
-        while (!currentNodes.All(node => node.EndsWith("Z")))
+        for (int i = 0; i < currentNodes.Length; i++)
         {
-            for (int i = 0; i < currentNodes.Length; i++)
+            int directionPosition = 0;
+            long steps = 0;
+            while (!currentNodes[i].EndsWith("Z"))
             {
                 currentNodes[i] = directions[directionPosition] == 'L' ?
-                    nodes[currentNodes[i]].Left : nodes[currentNodes[i]].Right;
+                        nodes[currentNodes[i]].Left : nodes[currentNodes[i]].Right;
+                steps += 1;
+                directionPosition += 1;
+                if (directionPosition > directions.Length - 1) directionPosition = 0;
             }
-            steps += 1;
-            directionPosition += 1;
-            if (directionPosition > directions.Length - 1) directionPosition = 0;
-            if (steps % 1000000 == 0) Console.WriteLine(steps);
+            minimumSteps[i] = steps;
         }
-        return steps.ToString();
+
+        Console.WriteLine("Minimum Steps: " + string.Join(", ", minimumSteps));
+        return LCM(minimumSteps).ToString();
+    }
+
+    private long GCD(long a, long b)
+    {
+        return (a == 0) ? b : GCD(b % a, a);
+    }
+
+    private long LCM(long[] numbers)
+    {
+        return numbers.Aggregate((a, b) => a * b / GCD(a, b));
     }
 }
 
