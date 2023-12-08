@@ -30,7 +30,6 @@ class Solution : SolutionBase
                     .Split(',')
                     .Select(value => value.Trim())
                     .ToArray();
-
                 return new Node(id, values[0], values[1]);
             })
             .ToDictionary(n => n.Id);
@@ -58,37 +57,22 @@ class Solution : SolutionBase
             .Select(pair => pair.Key)
             .ToArray();
 
-        Console.WriteLine("Start with nodes: " + string.Join(", ", currentNodes));
-        long[] minimumSteps = Enumerable.Repeat(long.MaxValue, currentNodes.Length).ToArray();
-
-        for (int i = 0; i < currentNodes.Length; i++)
-        {
-            int directionPosition = 0;
-            long steps = 0;
-            while (!currentNodes[i].EndsWith("Z"))
+        long[] minimumSteps = currentNodes.Select((node, i) =>
             {
-                currentNodes[i] = directions[directionPosition] == 'L' ?
-                        nodes[currentNodes[i]].Left : nodes[currentNodes[i]].Right;
-                steps += 1;
-                directionPosition += 1;
-                if (directionPosition > directions.Length - 1) directionPosition = 0;
-            }
-            minimumSteps[i] = steps;
-        }
+                int directionPosition = 0;
+                return (long)Enumerable.Range(0, int.MaxValue)
+                    .TakeWhile(_ => !node.EndsWith("Z"))
+                    .Select(_ => node = directions[directionPosition++ % directions.Length] == 'L' ? 
+                            nodes[node].Left : nodes[node].Right)
+                    .Count();
+            }).ToArray();
 
-        Console.WriteLine("Minimum Steps: " + string.Join(", ", minimumSteps));
         return LCM(minimumSteps).ToString();
     }
 
-    private long GCD(long a, long b)
-    {
-        return (a == 0) ? b : GCD(b % a, a);
-    }
+    private long GCD(long a, long b) => (a == 0) ? b : GCD(b % a, a);
+    private long LCM(long[] numbers) => numbers.Aggregate((a, b) => a * b / GCD(a, b));
 
-    private long LCM(long[] numbers)
-    {
-        return numbers.Aggregate((a, b) => a * b / GCD(a, b));
-    }
 }
 
 class Node(string id, string left, string right)
