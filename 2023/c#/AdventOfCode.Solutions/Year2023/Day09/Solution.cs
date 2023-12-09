@@ -50,20 +50,31 @@ class EnvHistory(int[] values)
         differences.Last().Add(0);
         for (int i = differences.Count - 2; i > -1; i--)
         {
-            Console.WriteLine("Handle differences line " + string.Join(", ", differences[i]));
             differences[i].Add(differences[i].Last() + differences[i + 1].Last());
         }
-        PrintDifferences();
+
         Console.WriteLine(string.Join(", ", Values));
+        PrintDifferences();
         Console.WriteLine("Future: " + (Values.Last() + differences[0].Last()));
         return Values.Last() + differences[0].Last();
     }
 
     public int CalculatePast()
     {
-        Values.Reverse();   
-        differences.Reverse();
-        return CalculateFuture();
+        Values = Values.Reverse().ToArray();
+        foreach (var item in differences)
+        {
+            item.Reverse();
+        }
+        differences.Last().Add(0);
+        for (int i = differences.Count - 2; i > -1; i--)
+        {
+            differences[i].Add(differences[i].Last() - differences[i + 1].Last());
+        }
+        Console.WriteLine(string.Join(", ", Values));
+        PrintDifferences();
+        Console.WriteLine("Future: " + (Values.Last() - differences[0].Last()));
+        return Values.Last() - differences[0].Last();
     }
 
     private void PrintDifferences()
