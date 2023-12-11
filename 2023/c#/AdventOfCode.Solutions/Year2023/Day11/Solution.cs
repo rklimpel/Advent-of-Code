@@ -16,52 +16,19 @@ class Solution : SolutionBase
             .ToArray();
         FindExpandRowsAndColumns(grid);
         galaxyPositions = GetGalaxyPositions(grid);
-        Console.WriteLine(string.Join(", ", galaxyPositions));
     }
 
     protected override string SolvePartOne()
     {
-        int[,] distances = new int[galaxyPositions.Count, galaxyPositions.Count];
-        for (int i = 0; i < galaxyPositions.Count; i++)
-        {
-            for (int j = 0; j < galaxyPositions.Count; j++)
-            {
-                distances[i, j] = Math.Abs(galaxyPositions[i].Item1 - galaxyPositions[j].Item1)
-                    + Math.Abs(galaxyPositions[i].Item2 - galaxyPositions[j].Item2);
-
-                foreach (var emptyRow in emptyRows)
-                {
-                    if ((emptyRow > galaxyPositions[i].Item1 && emptyRow < galaxyPositions[j].Item1) ||
-                        (emptyRow > galaxyPositions[j].Item1 && emptyRow < galaxyPositions[i].Item1))
-                    {
-                        distances[i, j] += 1;
-                    }
-                }
-
-                foreach (var emptyColumn in emptyColumns)
-                {
-                    if ((emptyColumn > galaxyPositions[i].Item2 && emptyColumn < galaxyPositions[j].Item2) ||
-                        (emptyColumn > galaxyPositions[j].Item2 && emptyColumn < galaxyPositions[i].Item2))
-                    {
-                        distances[i, j] += 1;
-                    }
-                }
-            }
-        }
-
-        int sum = 0;
-        for (int i = 0; i < galaxyPositions.Count; i++)
-        {
-            for (int j = 0; j < i; j++)
-            {
-                sum += distances[i, j];
-            }
-        }
-
-        return sum.ToString();
+        return GetDistanceSum(1).ToString();
     }
 
     protected override string SolvePartTwo()
+    {
+        return GetDistanceSum(999999).ToString();
+    }
+
+    private long GetDistanceSum(int expandAddition)
     {
         long[,] distances = new long[galaxyPositions.Count, galaxyPositions.Count];
         for (int i = 0; i < galaxyPositions.Count; i++)
@@ -76,7 +43,7 @@ class Solution : SolutionBase
                     if ((emptyRow > galaxyPositions[i].Item1 && emptyRow < galaxyPositions[j].Item1) ||
                         (emptyRow > galaxyPositions[j].Item1 && emptyRow < galaxyPositions[i].Item1))
                     {
-                        distances[i, j] += 1000000 - 1;
+                        distances[i, j] += expandAddition;
                     }
                 }
 
@@ -85,7 +52,7 @@ class Solution : SolutionBase
                     if ((emptyColumn > galaxyPositions[i].Item2 && emptyColumn < galaxyPositions[j].Item2) ||
                         (emptyColumn > galaxyPositions[j].Item2 && emptyColumn < galaxyPositions[i].Item2))
                     {
-                        distances[i, j] += 1000000 - 1;
+                        distances[i, j] += expandAddition;
                     }
                 }
             }
@@ -99,8 +66,7 @@ class Solution : SolutionBase
                 sum += distances[i, j];
             }
         }
-
-        return sum.ToString();
+        return sum;
     }
 
     private void FindExpandRowsAndColumns(char[][] originalGrid)
@@ -117,9 +83,6 @@ class Solution : SolutionBase
                 emptyColumns.Add(i);
             }
         }
-
-        Console.WriteLine("Empty Rows: " + string.Join(", ", emptyRows));
-        Console.WriteLine("Empty Columns: " + string.Join(", ", emptyColumns));
     }
 
     private List<Tuple<int, int>> GetGalaxyPositions(char[][] grid)
