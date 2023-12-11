@@ -20,24 +20,26 @@ class Solution : SolutionBase
 
     protected override string SolvePartOne()
     {
-        int[][] shortestPaths = FindShortestPaths(galaxyPositions, grid);
+        PrintGrid(grid, addGalaxyNumbers: true);
 
-        Console.WriteLine(string.Join(Environment.NewLine,
-            shortestPaths.Select(row => string.Join(" ", row.Select(distance =>
-                distance == int.MaxValue ? "?" : distance.ToString().PadLeft(3)))))
-        );
-
-        int sum = 0;
-        for (int i = 0; i < shortestPaths.Length; i++)
+        int[,] distances = new int[galaxyPositions.Count, galaxyPositions.Count];
+        for (int i = 0; i < galaxyPositions.Count; i++)
         {
-            for (int j = 0; j <= i - 1; j++)
+            for (int j = 0; j < galaxyPositions.Count; j++)
             {
-                Console.WriteLine($"Add Distance from {i + 1}->{j + 1} = {shortestPaths[i][j]}");
-                sum += shortestPaths[i][j];
+                distances[i, j] = Math.Abs(galaxyPositions[i].Item1 - galaxyPositions[j].Item1)
+                    + Math.Abs(galaxyPositions[i].Item2 - galaxyPositions[j].Item2);
             }
         }
 
-        PrintGrid(grid, addGalaxyNumbers: true);
+        int sum = 0;
+        for (int i = 0; i < galaxyPositions.Count; i++)
+        {
+            for (int j = 0; j < i; j++)
+            {
+                sum += distances[i, j];
+            }
+        }
 
         return sum.ToString();
     }
@@ -94,122 +96,9 @@ class Solution : SolutionBase
         }
 
         return expandedGrid
-        .Select(row => row.ToArray())
-        .ToArray();
+            .Select(row => row.ToArray())
+            .ToArray();
     }
-    public int[][] FindShortestPaths(
-        List<Tuple<int, int>> galaxyPositions, char[][] grid
-    )
-    {
-        List<int> allNodes = Enumerable.Range(0, grid.Length * grid[0].Length).ToList();
-        int nodeCount = allNodes.Count();
-        int[,] distances = new int[nodeCount, nodeCount];
-
-        // Set Max Value for all Distances
-        for (int i = 0; i < nodeCount; i++)
-        {
-            for (int j = 0; j < nodeCount; j++)
-            {
-                distances[i, j] = int.MaxValue;
-            }
-        }
-
-        //Init with inital neigbour distance values
-        for (int i = 0; i < nodeCount; i++)
-        {
-            for (int j = 0; j < nodeCount; j++)
-            {
-                if (i == j)
-                {
-                    distances[i, j] = 0;
-                }
-                else
-                {
-                    Tuple<int, int> gridPositionI = GetGridPosition(i, grid.Length - 1, grid[0].Length - 1);
-                    Tuple<int, int> gridPositionJ = GetGridPosition(j, grid.Length - 1, grid[0].Length - 1);
-                    distances[i, j] = AreAdjacentInGrid(gridPositionI, gridPositionJ) ? 1 : int.MaxValue;
-                }
-            }
-        }
-
-        for (int i = 0; i < nodeCount; i++)
-        {
-            for (int j = 0; j < nodeCount; j++)
-            {
-                if (distances[i, j] == int.MaxValue)
-                {
-                    Console.Write("-");
-                }
-                else
-                {
-                    Console.Write(distances[i, j].ToString());
-                }
-
-            }
-            Console.WriteLine();
-        }
-
-        // Floyd-Warshall Stuff
-        for (int k = 0; k < nodeCount; k++)
-        {
-            for (int i = 0; i < nodeCount; i++)
-            {
-                for (int j = 0; j < nodeCount; j++)
-                {
-                    if (distances[i, k] != int.MaxValue && distances[k, j] != int.MaxValue &&
-                        distances[i, k] + distances[k, j] < distances[i, j])
-                    {
-                        distances[i, j] = distances[i, k] + distances[k, j];
-                    }
-                }
-            }
-        }
-
-        // Print or process the result distances array
-        /*for (int i = 0; i < nodeCount; i++)
-        {
-            for (int j = 0; j < nodeCount; j++)
-            {
-                Console.Write(distances[i, j].ToString().PadLeft(3));
-            }
-            Console.WriteLine();
-        }*/
-
-        int[][] galaxyDistancesArray = new int[galaxyPositions.Count][];
-
-        for (int i = 0; i < galaxyPositions.Count; i++)
-        {
-            galaxyDistancesArray[i] = new int[galaxyPositions.Count];
-            for (int j = 0; j < galaxyPositions.Count; j++)
-            {
-                var gridPositionGalaxyI = galaxyPositions[i];
-                var allNodePositionI = gridPositionGalaxyI.Item1 * grid[0].Length + gridPositionGalaxyI.Item2;
-                var gridPositionGalaxyJ = galaxyPositions[j];
-                var allNodePositionJ = gridPositionGalaxyJ.Item1 * grid[0].Length + gridPositionGalaxyJ.Item2;
-                Console.WriteLine($"Distance between galaxy {i} and {j}: {distances[allNodePositionI, allNodePositionJ]}");
-                galaxyDistancesArray[i][j] = distances[allNodePositionI, allNodePositionJ];
-            }
-        }
-        return galaxyDistancesArray;
-    }
-
-    private bool AreAdjacentInGrid(Tuple<int, int> posA, Tuple<int, int> posB)
-    {
-        int rowDiff = Math.Abs(posA.Item1 - posB.Item1);
-        int colDiff = Math.Abs(posA.Item2 - posB.Item2);
-        return (rowDiff == 0 && colDiff == 1) || (rowDiff == 1 && colDiff == 0);
-    }
-
-    private Tuple<int, int> GetGridPosition(int node, int numRows, int numCols)
-    {
-        Console.WriteLine("GetGridPosition for Node " + node);
-        int row = node / numRows;
-        int col = node % numCols;
-        var result = Tuple.Create(row, col);
-        Console.WriteLine(result);
-        return result;
-    }
-
 
     private List<Tuple<int, int>> GetGalaxyPositions(char[][] grid)
     {
@@ -255,15 +144,4 @@ class Solution : SolutionBase
 
     }
 
-    private void PrintDistances(Tuple<int, int> start, Dictionary<Tuple<int, int>, int> distances)
-    {
-        Console.WriteLine($"Shortest paths from ({start.Item1},{start.Item2}):");
-
-        foreach (var kvp in distances)
-        {
-            Console.WriteLine($"To ({kvp.Key.Item1},{kvp.Key.Item2}): {kvp.Value} steps");
-        }
-
-        Console.WriteLine();
-    }
 }
