@@ -34,9 +34,11 @@ class Solution : SolutionBase
     {
         string key = $"{springRow}{string.Join(",", groupSizes)}{currentGroup}";
         if (cache.TryGetValue(key, out long cachedResult)) return cachedResult;
+
         if (springRow == "") return groupSizes.Length == 0 && currentGroup == 0 ? 1 : 0;
+
         long branchSolutions = 0;
-        string[] possible = springRow[0] == '?' ? new[] { ".", "#" } : new[] { springRow[0].ToString() };
+        string[] possible = springRow[0] == '?' ? [".", "#"] : [springRow[0].ToString()];
         foreach (string symbol in possible)
         {
             if (symbol == "." && currentGroup == 0)
@@ -52,6 +54,7 @@ class Solution : SolutionBase
                 branchSolutions += CountSolutions(springRow.Substring(1), groupSizes, currentGroup + 1);
             }
         }
+
         cache[key] = branchSolutions;
         return branchSolutions;
     }
