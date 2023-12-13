@@ -64,7 +64,7 @@ class Solution : SolutionBase
     protected override string SolvePartTwo()
     {
         Console.WriteLine("Solve Part 2");
-        int result = 0;
+        /*int result = 0;
         foreach (var grid in grids)
         {
             var gridResult = 0;
@@ -121,6 +121,38 @@ class Solution : SolutionBase
             Console.WriteLine("Grid Result: " + gridResult);
             result += gridResult;
         }
+        return $"{result}";*/
+
+        int result = 0;
+        int id = 0;
+
+        foreach (var data in grids)
+        {
+            id += 1;
+            int res = FindMirror(data);
+            if (res == -1)
+            {
+                var transposedData = TransposeGrid(data);
+                res = FindMirror(transposedData);
+
+                if (res == -1)
+                {
+                    Console.WriteLine($"No solution found for line {id}");
+                }
+                else
+                {
+                    Console.WriteLine($"Line {id} found vertical solution at {res}");
+                }
+
+                result += res;
+            }
+            else
+            {
+                Console.WriteLine($"Line {id} found horizontal solution at {res}");
+                result += res * 100;
+            }
+        }
+
         return $"{result}";
     }
 
@@ -211,4 +243,118 @@ class Solution : SolutionBase
     }
 
     private void PrintGrid(char[][] grid) => grid.ToList().ForEach(line => Console.WriteLine(new string(line)));
+
+    private int CheckSmudgeLines(int i, int j, char[][] data)
+    {
+        var first = data[i];
+        var second = data[j];
+        var thisIsTheDiffCount = 0;
+
+        for (int k = 0; k < first.Length; k++)
+        {
+            if (first[k] != second[k])
+            {
+                thisIsTheDiffCount += 1;
+            }
+            if (thisIsTheDiffCount > 1)
+            {
+                return -1;
+            }
+        }
+
+        return thisIsTheDiffCount == 1 ? 1 : 0;
+    }
+
+    private int CheckSame(int k, int n, char[][] lines, ref int myAwesomeSmugCounter)
+    {
+        if (k >= 0 && n < lines.Length)
+        {
+            var wasSmug = CheckSmudgeLines(k, n, lines);
+            if (wasSmug == -1)
+            {
+                return -1;
+            }
+
+            if (wasSmug == 1)
+            {
+                if (myAwesomeSmugCounter > 0)
+                {
+                    return -1;
+                }
+                else
+                {
+                    myAwesomeSmugCounter += 1;
+                    return 1;
+                }
+            }
+
+            return lines[k].SequenceEqual(lines[n]) ? 1 : -1;
+        }
+
+        return 0;
+    }
+
+    private int LoopThrough(int i, char[][] data, ref int myAwesomeSmugCounter)
+    {
+        int idx = 0;
+        for (int j = i; j > 0; j--)
+        {
+            idx += 1;
+            var cellRes = CheckSame(i - idx, i + idx + 1, data, ref myAwesomeSmugCounter);
+            if (cellRes == -1)
+            {
+                return -1;
+            }
+            else if (cellRes == 0)
+            {
+                return i + 1;
+            }
+        }
+
+        return i + 1;
+    }
+
+    private int FindMirror(char[][] data)
+    {
+        int myAwesomeSmugCounter = 0;
+
+        for (int i = 0; i < data.Length - 1; i++)
+        {
+            myAwesomeSmugCounter = 0;
+            myAwesomeSmugCounter = CheckSmudgeLines(i, i + 1, data);
+
+            if (myAwesomeSmugCounter == -1)
+            {
+                continue;
+            }
+
+            var res = CheckSame(i, i + 1, data, ref myAwesomeSmugCounter);
+
+            if (res < 1 && myAwesomeSmugCounter == 0)
+            {
+                continue;
+            }
+            else if (res == 1 || myAwesomeSmugCounter == 1)
+            {
+                if (i == 0 && myAwesomeSmugCounter == 1)
+                {
+                    return i + 1;
+                }
+
+                var val = LoopThrough(i, data, ref myAwesomeSmugCounter);
+
+                if (val == -1 || myAwesomeSmugCounter == 0)
+                {
+                    continue;
+                }
+
+                if (myAwesomeSmugCounter == 1)
+                {
+                    return val;
+                }
+            }
+        }
+
+        return -1;
+    }
 }
