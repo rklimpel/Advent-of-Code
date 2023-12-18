@@ -13,4 +13,18 @@ class Solution : SolutionBase
     {
         return "";
     }
+
+    public List<Tuple<int>> FindEnergizedTiles(char[][] grid, List<Tuple<int>> energizedTiles, Tuple<int> beamPosition, Direction beamDirection)
+    {
+        
+        return energizedTiles;
+    }    
+}
+
+public enum Direction
+{
+    UP,
+    RIGHT,
+    DOWN,
+    LEFT
 }
